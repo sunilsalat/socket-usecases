@@ -1,0 +1,30 @@
+<script src="/bad-path/socket.io.js"></script>
+
+<ul id="list"></ul>
+
+<form action="/" method="get" id="form-submit">
+  <label for="fname">First name:</label>
+  <input type="text" id="fname" name="fname" /><br /><br />
+  <input type="submit" value="Submit" />
+</form>
+
+<script>
+  const socket = io("http://localhost:8000", { path: "/bad-path" });
+  socket.on("connect", () => {
+    console.log(socket.id);
+  });
+
+  socket.on("msg-to-all-clients", (data) => {
+    const chatElem = document.getElementById("list");
+    var li = document.createElement("li");
+    li.appendChild(document.createTextNode(data));
+    chatElem.appendChild(li);
+  });
+
+  const chatInput = document.getElementById("form-submit");
+
+  chatInput.addEventListener("submit", (e) => {
+    e.preventDefault();
+    socket.emit("send-msg", e.target[0].value);
+  });
+</script>

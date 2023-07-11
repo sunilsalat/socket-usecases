@@ -1,0 +1,29 @@
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+  /* 
+  
+    socket.on("connect", () => {
+      socket.on("msg-from-server", (data) => {
+          console.log(data);
+      });
+    });
+
+    Handling event in (connect) handler registers a new event every time it reconnect, 
+    if we kill , or refresh the (express/io server) , notice the (msg-from-server) event log in browser it logged multiple time,
+    NOTE - Do Not add events in (connect) handler itself
+
+
+    */
+
+  const socket = io("http://localhost:8000");
+
+  socket.on("connect", () => {
+    console.log(socket.id);
+    socket.emit("msg-from-client", { data: "msg from client" });
+  });
+
+  socket.on("msg-from-server", (data) => {
+    console.log(data);
+  });
+</script>
