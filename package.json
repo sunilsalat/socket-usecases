@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon basicchat-app/src/chat.js"
+    "start": "nodemon slack-clone/src/slack.js"
   },
   "keywords": [],
   "author": "",
