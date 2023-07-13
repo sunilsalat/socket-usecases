@@ -4,14 +4,14 @@ let listners = {
   nsChange: {},
 };
 
-const addListeners = (endpoint) => {
-  if (!listners.nsChange[endpoint]) {
-    nameSpaceSockets[endpoint].on("nsChange", (data) => {
+const addListeners = (namespaceId) => {
+  if (!listners.nsChange[namespaceId]) {
+    nameSpaceSockets[namespaceId].on("nsChange", (data) => {
       console.log("data>", data);
     });
   }
   const ns = listners.nsChange;
-  ns[endpoint] = true;
+  ns[namespaceId] = true;
 };
 
 socket.on("connect", () => {
@@ -20,6 +20,7 @@ socket.on("connect", () => {
 });
 
 socket.on("nsList", (nsData) => {
+  console.log(nsData);
   /* 
   
   Note - retreiving namespaces from ther server/db, 
@@ -37,10 +38,11 @@ socket.on("nsList", (nsData) => {
     //update the HTML with each ns
     nameSapcesDiv.innerHTML += `<div class="namespace" ns="${ns.endpoint}"><img src="${ns.image}"></div>`;
 
-    if (!nameSpaceSockets[ns.endpoint]) {
-      nameSpaceSockets[ns.endpoint] = io(`http://localhost:8000${ns.endpoint}`);
+    if (!nameSpaceSockets[ns.id]) {
+      console.log("inside");
+      nameSpaceSockets[ns.id] = io(`http://localhost:8000${ns.endpoint}`);
     }
-    addListeners(ns.endpoint);
+    addListeners(ns.id);
   });
 
   Array.from(document.getElementsByClassName("namespace")).forEach(

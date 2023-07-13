@@ -17,4 +17,13 @@ const joinNs = (element, nsData) => {
             }"></span>${room.roomTitle}
         </li>`;
   });
+
+  const allRooms = document.querySelectorAll(".room");
+
+  Array.from(allRooms).forEach((elem) => {
+    elem.addEventListener("click", (e) => {
+      const elemAtt = elem.getAttribute("namespaceId");
+      joinRoom(e.target.innerText, elemAtt);
+    });
+  });
 };

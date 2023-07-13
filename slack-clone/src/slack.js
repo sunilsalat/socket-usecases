@@ -26,6 +26,12 @@ io.on("connection", (socket) => {
 
 nsData.forEach((ns) => {
   io.of(ns.endpoint).on("connection", (socket) => {
-    console.log(`Socket ${socket.id} connected to ns ${ns.endpoint}`);
+    // console.log(`Socket ${socket.id} connected to ns ${ns.endpoint}`);
+
+    socket.on("joinRoom", async (roomTitle, cb) => {
+      socket.join(roomTitle);
+      const sockets = await io.of(ns.endpoint).in(roomTitle).fetchSockets();
+      cb({ users: sockets.length });
+    });
   });
 });
