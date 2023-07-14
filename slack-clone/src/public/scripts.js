@@ -2,16 +2,42 @@ const socket = io("http://localhost:8000");
 let nameSpaceSockets = {};
 let listners = {
   nsChange: {},
+  msgToRoom: {},
 };
+
+// global variable we can update when user click namespace
+let selectedNsId = 0;
+
+document.querySelector("#message-form").addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const newMessage = document.querySelector("#user-message").value;
+  nameSpaceSockets[selectedNsId].emit("newMessageToRoom", {
+    newMessage,
+    date: Date.now(),
+    avatar: "https://via.placeholder.com/30",
+    userName: "Rob",
+    selectedNsId,
+  });
+
+  document.querySelector("#user-message").value = "";
+});
 
 const addListeners = (namespaceId) => {
   if (!listners.nsChange[namespaceId]) {
-    nameSpaceSockets[namespaceId].on("nsChange", (data) => {
-      console.log("data>", data);
-    });
+    nameSpaceSockets[namespaceId].on("nsChange", (data) => {});
+    const ns = listners.nsChange;
+    ns[namespaceId] = true;
   }
-  const ns = listners.nsChange;
-  ns[namespaceId] = true;
+
+  if (!listners.msgToRoom[namespaceId]) {
+    nameSpaceSockets[namespaceId].on("newMessage", (data) => {
+      document.querySelector("#messages").innerHTML += buildMessageHtml(data);
+    });
+
+    const ns = listners.msgToRoom;
+    ns[namespaceId] = true;
+  }
 };
 
 socket.on("connect", () => {
@@ -35,11 +61,9 @@ socket.on("nsList", (nsData) => {
   nameSapcesDiv.innerHTML = "";
 
   nsData.forEach((ns) => {
-    //update the HTML with each ns
     nameSapcesDiv.innerHTML += `<div class="namespace" ns="${ns.endpoint}"><img src="${ns.image}"></div>`;
 
     if (!nameSpaceSockets[ns.id]) {
-      console.log("inside");
       nameSpaceSockets[ns.id] = io(`http://localhost:8000${ns.endpoint}`);
     }
     addListeners(ns.id);
@@ -48,6 +72,7 @@ socket.on("nsList", (nsData) => {
   Array.from(document.getElementsByClassName("namespace")).forEach(
     (element) => {
       element.addEventListener("click", (e) => {
+        // joins ns is to update dom with namespaces
         joinNs(element, nsData);
       });
     }
@@ -56,3 +81,19 @@ socket.on("nsList", (nsData) => {
   //if lastNs is set, grab that element instead of 0.
   joinNs(document.getElementsByClassName("namespace")[0], nsData);
 });
+
+const buildMessageHtml = (object) => {
+  return `<li>
+                    <div class="user-image">
+                        <img src="${object.avatar}" />
+                    </div>
+                    <div class="user-message">
+                        <div class="user-name-time">${
+                          object.userName
+                        } <span>${new Date(
+    object.date
+  ).toLocaleString()}</span></div>
+                        <div class="message-text">${object.newMessage}</div>
+                    </div>
+                </li>`;
+};
