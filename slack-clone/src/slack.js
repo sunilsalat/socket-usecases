@@ -40,8 +40,8 @@ nsData.forEach((ns) => {
       const thisRoom = thisNs.rooms.find(
         (room) => room.roomTitle === roomObj.roomTitle
       );
+
       const thisChatHistory = thisRoom.history;
-      console.log({ thisChatHistory });
       const roomsSocketJoined = socket.rooms;
       let i = 0;
       roomsSocketJoined.forEach((room) => {
