@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon slack-clone/src/slack.js"
+    "start": "nodemon agar-clone/src/index.js"
   },
   "keywords": [],
   "author": "",
