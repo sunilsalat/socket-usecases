@@ -1,9 +1,5 @@
-const init = () => {
-  draw();
-};
-
-player.locX = Math.floor(500 * Math.random() + 10); // horizantal line
-player.locY = Math.floor(500 * Math.random() + 10); // vertical line
+// player.locX = Math.floor(500 * Math.random() + 10); // horizantal line
+// player.locY = Math.floor(500 * Math.random() + 10); // vertical line
 
 canvas.addEventListener("mousemove", (event) => {
   const mousePosition = {
@@ -31,25 +27,14 @@ canvas.addEventListener("mousemove", (event) => {
     yVector = 1 - (angleDeg + 90) / 90;
   }
 
-  speed = 10;
-  xV = xVector;
-  yV = yVector;
-
-  if ((player.locX < 5 && xV < 0) || (player.locX > 500 && xV > 0)) {
-    player.locY -= speed * yV;
-  } else if ((player.locY < 5 && yV > 0) || (player.locY > 500 && yV < 0)) {
-    player.locX += speed * xV;
-  } else {
-    player.locX += speed * xV;
-    player.locY -= speed * yV;
-  }
+  player.xVector = xVector ? xVector : 0.1;
+  player.yVector = yVector ? yVector : 0.1;
 });
 
 const draw = () => {
   //   clearRect clear out the canvas
-  context.clearRect(0, 0, canvas.width, canvas.height);
-
   context.setTransform(1, 0, 0, 1, 0, 0);
+  context.clearRect(0, 0, canvas.width, canvas.height);
 
   // clamp the screen/vp to the players location (x, y)
   const camX = -player.locX + canvas.width / 2;
@@ -57,14 +42,32 @@ const draw = () => {
 
   context.translate(camX, camY);
 
-  context.beginPath();
-  context.fillStyle = "rgb(255, 0, 0)";
-  context.arc(player.locX, player.locY, 10, 0, Math.PI * 2);
-  context.arc(200, 200, 10, 0, Math.PI * 2);
-  context.fill();
-  context.lineWidth = 3;
-  context.strokeStyle = "rgb(0, 255, 0)";
-  context.stroke();
+  // draw all the players
+  players.forEach((p) => {
+    context.beginPath();
+    context.fillStyle = p.playerData.color;
+    context.arc(
+      p.playerData.locX,
+      p.playerData.locY,
+      p.playerData.radius,
+      0,
+      Math.PI * 2
+    );
+    // context.arc(200, 200, 10, 0, Math.PI * 2);
+    context.fill();
+    context.lineWidth = 3;
+    context.strokeStyle = "rgb(0, 255, 0)";
+    context.stroke();
+  });
+
+  // drawing all the orbs
+  orbs.forEach((orb) => {
+    context.beginPath();
+    context.fillStyle = orb.color;
+    context.arc(orb.locX, orb.locY, orb.radius, 0, Math.PI * 2);
+    context.fill();
+  });
+
   // requestAnimationFrame is controllerd loop
   // it runs recursivly, every  paint/frame. if framerate is 35 fps
   requestAnimationFrame(draw);
