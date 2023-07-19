@@ -1,36 +1,6 @@
 // player.locX = Math.floor(500 * Math.random() + 10); // horizantal line
 // player.locY = Math.floor(500 * Math.random() + 10); // vertical line
 
-canvas.addEventListener("mousemove", (event) => {
-  const mousePosition = {
-    x: event.clientX,
-    y: event.clientY,
-  };
-  const angleDeg =
-    (Math.atan2(
-      mousePosition.y - canvas.height / 2,
-      mousePosition.x - canvas.width / 2
-    ) *
-      180) /
-    Math.PI;
-  if (angleDeg >= 0 && angleDeg < 90) {
-    xVector = 1 - angleDeg / 90;
-    yVector = -(angleDeg / 90);
-  } else if (angleDeg >= 90 && angleDeg <= 180) {
-    xVector = -(angleDeg - 90) / 90;
-    yVector = -(1 - (angleDeg - 90) / 90);
-  } else if (angleDeg >= -180 && angleDeg < -90) {
-    xVector = (angleDeg + 90) / 90;
-    yVector = 1 + (angleDeg + 90) / 90;
-  } else if (angleDeg < 0 && angleDeg >= -90) {
-    xVector = (angleDeg + 90) / 90;
-    yVector = 1 - (angleDeg + 90) / 90;
-  }
-
-  player.xVector = xVector ? xVector : 0.1;
-  player.yVector = yVector ? yVector : 0.1;
-});
-
 const draw = () => {
   //   clearRect clear out the canvas
   context.setTransform(1, 0, 0, 1, 0, 0);
@@ -38,8 +8,9 @@ const draw = () => {
 
   // clamp the screen/vp to the players location (x, y)
   const camX = -player.locX + canvas.width / 2;
-  const camY = -player.locY + canvas.width / 2;
+  const camY = -player.locY + canvas.height / 2;
 
+  //translate moves the cavnas/context to where the player is at
   context.translate(camX, camY);
 
   // draw all the players
@@ -72,3 +43,33 @@ const draw = () => {
   // it runs recursivly, every  paint/frame. if framerate is 35 fps
   requestAnimationFrame(draw);
 };
+
+canvas.addEventListener("mousemove", (event) => {
+  const mousePosition = {
+    x: event.clientX,
+    y: event.clientY,
+  };
+  const angleDeg =
+    (Math.atan2(
+      mousePosition.y - canvas.height / 2,
+      mousePosition.x - canvas.width / 2
+    ) *
+      180) /
+    Math.PI;
+  if (angleDeg >= 0 && angleDeg < 90) {
+    xVector = 1 - angleDeg / 90;
+    yVector = -(angleDeg / 90);
+  } else if (angleDeg >= 90 && angleDeg <= 180) {
+    xVector = -(angleDeg - 90) / 90;
+    yVector = -(1 - (angleDeg - 90) / 90);
+  } else if (angleDeg >= -180 && angleDeg < -90) {
+    xVector = (angleDeg + 90) / 90;
+    yVector = 1 + (angleDeg + 90) / 90;
+  } else if (angleDeg < 0 && angleDeg >= -90) {
+    xVector = (angleDeg + 90) / 90;
+    yVector = 1 - (angleDeg + 90) / 90;
+  }
+
+  player.xVector = xVector ? xVector : 0.1;
+  player.yVector = yVector ? yVector : 0.1;
+});

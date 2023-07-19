@@ -35,7 +35,6 @@ io.on("connection", (socket) => {
     const playerConfig = new PlayerConfig(settings);
     const playerData = new PlayerData(playerName, settings);
     player = new Player(socket.id, playerConfig, playerData);
-    console.log(player);
     // Storing player to players array
     players.push(player);
     playersForUsers.push({ playerData });
@@ -45,7 +44,6 @@ io.on("connection", (socket) => {
   socket.on("tock", (data) => {
     // client updating its position on server every 33 ms
     if (!player.playerConfig) {
-      console.log("inside");
       return;
     }
 

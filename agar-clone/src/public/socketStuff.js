@@ -17,6 +17,7 @@ const init = async () => {
     Informing server, curr client's mouse position,
     every 33 milliseconds 
   */
+
   setInterval(() => {
     socket.emit("tock", {
       xVector: player.xVector ? player.xVector : 0.1,
