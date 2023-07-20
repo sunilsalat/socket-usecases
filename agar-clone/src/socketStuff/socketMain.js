@@ -13,6 +13,7 @@ const PlayerData = require("./classes/PlayerData");
 const orbs = [];
 const players = [];
 const playersForUsers = [];
+let tickTockInterval;
 const settings = {
   defaultNumOfOrbs: 500,
   defaultSpeed: 6,
@@ -28,7 +29,7 @@ io.on("connection", (socket) => {
   socket.on("init", (playerObj, cb) => {
     // run only when first player connect , thn it is going to run forever,
     if (players.length === 0) {
-      setInterval(() => {
+      tickTockInterval = setInterval(() => {
         io.to("game").emit("tick", playersForUsers);
       }, 33); // 30fps is a 1000 millisecond /33
     }
@@ -109,10 +110,19 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    // clear interval if no players in the room
+    // loop through player and splice disconnected  player from array
+    for (var i = 0; i < players.length; i++) {
+      if (players[i].socketId === player.socketId) {
+        players.splice(i, 1, {});
+        playersForUsers.splice(i, 1, {});
+        break;
+      }
+    }
 
+    // clear interval if no players in the room
     if (players.length === 0) {
       // disconnect
+      clearInterval(tickTockInterval);
     }
   });
 });
