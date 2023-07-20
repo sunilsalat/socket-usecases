@@ -31,8 +31,34 @@ const init = async () => {
 };
 
 socket.on("tick", (playersArray) => {
-  console.log(playersArray);
   players = playersArray;
-  player.locX = players[player.indexInArray].playerData.locX;
-  player.locy = players[player.indexInArray].playerData.locy;
+  if (players[player.indexInArray].playerData) {
+    player.locX = players[player.indexInArray].playerData.locX;
+    player.locY = players[player.indexInArray].playerData.locY;
+  }
+});
+
+socket.on("orbSwitch", (data) => {
+  // server just told us to replace , absorbed orb in orbs array
+  orbs.splice(data.capturedOrbI, 1, data.newOrb);
+});
+
+socket.on("PlayerAbsorbed", (absorbData) => {
+  document.querySelector(
+    "#game-message"
+  ).innerHTML = `${absorbData.absorbed} was absorbed by ${absorbData.absorbedBy}`;
+  document.querySelector("#game-message").style.opacity = 1;
+  window.setTimeout(() => {
+    document.querySelector("#game-message").style.opacity = 0;
+  }, 2000);
+});
+
+socket.on("updateLeaderBoard", (leaderBoard) => {
+  document.querySelector(".leader-board").innerHTML = "";
+
+  leaderBoard.forEach((p) => {
+    document.querySelector(
+      ".leader-board"
+    ).innerHTML += `<li class='leaderboard-player'> ${p.name} - ${p.score} </li>`;
+  });
 });

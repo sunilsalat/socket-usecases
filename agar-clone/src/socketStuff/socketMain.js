@@ -1,4 +1,8 @@
 const io = require("../server").io;
+const {
+  checkForOrbCollisions,
+  checkForPlayerCollisions,
+} = require("./checkCollisions");
 // const app = require("../server/app").app;
 
 const Orb = require("./classes/Orb");
@@ -54,18 +58,53 @@ io.on("connection", (socket) => {
     const yV = player.playerConfig.yVector;
 
     if (
-      (player.playerData.locX < 5 && xV < 0) ||
-      (player.playerData.locX > 500 && xV > 0)
-    ) {
-      player.playerData.locY -= speed * yV;
-    } else if (
-      (player.playerData.locY < 5 && yV > 0) ||
-      (player.playerData.locY > 500 && yV < 0)
+      (player.playerData.locX > 5 && xV < 0) ||
+      (player.playerData.locX < settings.worldWidth && xV > 0)
     ) {
       player.playerData.locX += speed * xV;
-    } else {
-      player.playerData.locX += speed * xV;
+    }
+
+    if (
+      (player.playerData.locY > 5 && yV > 0) ||
+      (player.playerData.locY < settings.worldHeight && yV < 0)
+    ) {
       player.playerData.locY -= speed * yV;
+    }
+
+    // 1. check for tocking player to hit orbs
+    // below function take current players and its data, and check for a collisions with orbs  and return its index
+    const capturedOrbI = checkForOrbCollisions(
+      player.playerData,
+      player.playerConfig,
+      orbs,
+      settings
+    );
+
+    if (capturedOrbI != null) {
+      // replace collided orbs with new orb
+      orbs.splice(capturedOrbI, 1, new Orb(settings));
+      // update the client with orbdetail so client update its orbs array
+      const orbData = {
+        capturedOrbI,
+        newOrb: orbs[capturedOrbI],
+      };
+      // emit to all player playing game
+      io.to("game").emit("orbSwitch", orbData);
+      io.to("game").emit("updateLeaderBoard", getLeaderBoard());
+
+      // 2. check for players collision and publish to cleint
+      const absorbData = checkForPlayerCollisions(
+        player.playerData,
+        player.playerConfig,
+        players,
+        playersForUsers,
+        socket.id
+      );
+
+      if (absorbData) {
+        io.to("game").emit("PlayerAbsorbed", absorbData);
+        io.to("game").emit("updateLeaderBoard", getLeaderBoard());
+      }
     }
   });
 
@@ -83,4 +122,18 @@ function initGame() {
   for (let i = 0; i < settings.defaultNumOfOrbs; i++) {
     orbs.push(new Orb(settings));
   }
+}
+
+function getLeaderBoard() {
+  const leaderBoard = players.map((p) => {
+    if (p.playerData) {
+      return {
+        name: p.playerData.name,
+        score: p.playerData.score,
+      };
+    }
+    return {};
+  });
+
+  return leaderBoard;
 }

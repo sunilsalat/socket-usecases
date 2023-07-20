@@ -15,6 +15,9 @@ const draw = () => {
 
   // draw all the players
   players.forEach((p) => {
+    if (!p.playerData) {
+      return;
+    }
     context.beginPath();
     context.fillStyle = p.playerData.color;
     context.arc(
