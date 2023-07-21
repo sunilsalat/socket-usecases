@@ -15,12 +15,12 @@ const players = [];
 const playersForUsers = [];
 let tickTockInterval;
 const settings = {
-  defaultNumOfOrbs: 500,
+  defaultNumOfOrbs: 5000,
   defaultSpeed: 6,
   defaultSize: 6,
   defaultZoom: 1.5,
-  worldWidth: 500,
-  worldHeight: 500,
+  worldWidth: 5000,
+  worldHeight: 5000,
   defaultGenericOrbSize: 5,
 };
 
