@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon agar-clone/src/index.js"
+    "start": "nodemon load-balancing/server/servers.js"
   },
   "keywords": [],
   "author": "",

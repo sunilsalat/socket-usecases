@@ -4,6 +4,7 @@ const { Server } = require("socket.io");
 const numCPUs = require("os").cpus().length;
 const { setupMaster, setupWorker } = require("@socket.io/sticky");
 const { createAdapter, setupPrimary } = require("@socket.io/cluster-adapter");
+const { socketMain } = require("./socketMain");
 
 if (cluster.isMaster) {
   console.log(`Master ${process.pid} is running`);
@@ -28,7 +29,7 @@ if (cluster.isMaster) {
   //   serialization: "advanced",
   // });
 
-  httpServer.listen(3000);
+  httpServer.listen(8000);
 
   for (let i = 0; i < numCPUs; i++) {
     cluster.fork();
@@ -42,7 +43,12 @@ if (cluster.isMaster) {
   console.log(`Worker ${process.pid} started`);
 
   const httpServer = http.createServer();
-  const io = new Server(httpServer);
+  const io = new Server(httpServer, {
+    cors: {
+      origin: ["http://localhost:3000"],
+      credentials: true,
+    },
+  });
 
   // use the cluster adapter
   io.adapter(createAdapter());
@@ -50,7 +56,6 @@ if (cluster.isMaster) {
   // setup connection with the primary process
   setupWorker(io);
 
-  io.on("connection", (socket) => {
-    /* ... */
-  });
+  // event handler file
+  socketMain(io);
 }

@@ -10,7 +10,9 @@ const options = {
     token: "239rfaiskdfvq243EGa4q3wefsdad",
   },
 };
-const socket = io("http://127.0.0.1:3000", options); // :3000 is where our server is listening
+
+const socket = io("http://127.0.0.1:8000", options); // :3000 is where our server is listening
+
 socket.on("connect", () => {
   // console.log("We connected to the server!")
   //we need a way to identify this machine to the server, for front-end useage
@@ -23,7 +25,7 @@ socket.on("connect", () => {
     const isInternetFacing = !nI[key][0].internal;
     if (isInternetFacing) {
       //we have a macA we can use!
-      macA = nI[key][0].mac + Math.floor(Math.random() * 100000);
+      macA = nI[key][0].mac;
       break;
     }
   }
@@ -126,8 +128,8 @@ const performanceLoadData = () =>
     });
   });
 
-const run = async () => {
-  const data = await performanceLoadData();
-  console.log(data);
-};
-run();
+// const run = async () => {
+//   const data = await performanceLoadData();
+//   console.log(data);
+// };
+// run();
